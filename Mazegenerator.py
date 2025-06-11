@@ -24,12 +24,9 @@ class MazeGenerator:
                 self.maze_algo(cur_row, cur_col) 
             
     def generate_maze(self):
-        if (self.row)%2==0:
-            self.maze_algo(1,0)
-            self.maze[1][0] = 'x'
-        else:
-            self.maze_algo(0,0)
-            self.maze[0][0] = 'x'
+        
+        self.maze_algo(0,0)
+        self.maze[0][0] = 'x'
         self.maze[self.row-1][self.column-1] = 'y'
         for i in range(self.row):
             self.maze[i] = [str(j) for j in self.maze[i]]
