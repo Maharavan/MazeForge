@@ -26,8 +26,7 @@ class PyMaze:
                     game_begin = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.start_button_rect and self.start_button_rect.collidepoint(event.pos):
-                        self.state = 'game'
-                        
+                        self.state = 'game'     
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
@@ -41,7 +40,7 @@ class PyMaze:
 
     def welcome_to_glitch_grid(self):
         try:
-            image = pygame.image.load('assets/welcome.jpeg').convert()
+            image = pygame.image.load('assets/welcome.png').convert()
             image = pygame.transform.scale(image,(self.width,self.height))
         except pygame.error:
             image = pygame.Surface((self.width, self.height))
@@ -49,13 +48,13 @@ class PyMaze:
         self.screen.blit(image, (0, 0))
 
         start_button_image = pygame.image.load('assets/start.png').convert_alpha()
-        start_button_image = pygame.transform.scale(start_button_image, (150, 150))
+        start_button_image = pygame.transform.scale(start_button_image, (100, 100))
         button_rect = start_button_image.get_rect(center=(self.width // 2-100, self.height //2))
         self.screen.blit(start_button_image, button_rect)
         self.start_button_rect = button_rect
 
         end_button_image = pygame.image.load('assets/quit.png').convert_alpha()
-        end_button_image = pygame.transform.scale(end_button_image, (115, 115))
+        end_button_image = pygame.transform.scale(end_button_image, (100, 100))
         button_rect = end_button_image.get_rect(center=(self.width // 2+100, self.height //2))
         self.screen.blit(end_button_image, button_rect)
 
@@ -69,7 +68,13 @@ class PyMaze:
         margin = 5
         maze_width = columns * (cell_size + margin)
         maze_height = rows * (cell_size + margin)
-        self.screen.fill((0,0,0))
+        try:
+            image = pygame.image.load('assets/background.png').convert()
+            image = pygame.transform.scale(image,(self.width,self.height))
+        except pygame.error:
+            image = pygame.Surface((self.width, self.height))
+            image.fill((0, 0, 0))
+        self.screen.blit(image, (0, 0))
         x_offset = (self.width - maze_width) // 2
         y_offset = (self.height - maze_height) // 2
         for row in range(rows):
