@@ -15,37 +15,49 @@ class PyMaze:
         self.state = 'menu'
         self.cell_size = 30
         self.margin = 5
-        self.loc = []
+        self.mov_row = 0
+        self.mov_col = 0
+        self.assets = None
     def invoke_game(self):
         pygame.init()
         
+
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption('MazeForge')
+        self.assets = {
+        'wall': pygame.transform.scale(pygame.image.load('assets/wall.png').convert_alpha(), (self.cell_size, self.cell_size)),
+        'path': pygame.transform.scale(pygame.image.load('assets/path.png').convert_alpha(), (self.cell_size, self.cell_size)),
+        'jerry': pygame.transform.scale(pygame.image.load('assets/jerry.png').convert_alpha(), (self.cell_size, self.cell_size)),
+        'icon': pygame.image.load('assets/icon.png').convert_alpha()
+        }
         try:
-            icon = pygame.image.load('assets/icon.png').convert_alpha()
-            pygame.display.set_icon(icon)
+            pygame.display.set_icon(self.assets['icon'])
             pygame.display.set_caption('MazeForge')
         except Exception as e:
             print('Using default icon:', e)
         
         game_begin = True
         while game_begin:
-            pygame.time.delay(10)
+            # pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     game_begin = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.start_button_rect and self.start_button_rect.collidepoint(event.pos):
-                        self.state = 'game'     
+                        self.state = 'maze_create'     
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
+                elif event.type ==pygame.KEYDOWN:
+                    if self.state=='game':
+                        self.key_movement(event.key)
             if self.state =='menu':
                 self.welcome_to_glitch_grid()
-            elif self.state=='game':
-                self.loc.clear()
+            elif self.state=='maze_create':
                 self.create_box()
-                self.key_movement()
+                self.create_timer()
+                self.state='game'
+                
             pygame.display.flip()
             self.fpsClock.tick(self.fps)
         pygame.quit()
@@ -88,20 +100,19 @@ class PyMaze:
 
         x_offset = (self.width - maze_width) // 2
         y_offset = (self.height - maze_height) // 2
-
+        
         for row in range(rows):
             for cols in range(columns):
                 x = x_offset + cols * (self.cell_size + self.margin)
                 y = y_offset + row * (self.cell_size + self.margin)
-                self.loc.append((x,y))
                 cell_value = self.matrix[row][cols]
 
                 if cell_value == '1':
-                    self.insert_image_in_maze('assets/wall.png',x,y)
+                    self.screen.blit(self.assets['wall'], (x, y))
                 elif cell_value == '0':
-                    self.insert_image_in_maze('assets/path.png',x,y)
+                    self.screen.blit(self.assets['path'], (x, y))
                 elif cell_value == 'x':
-                    self.insert_image_in_maze('assets/jerry.png',x,y)
+                    self.screen.blit(self.assets['jerry'], (x, y))
                 else:
                     if cell_value == 'y':
                         color = (0, 255, 0)
@@ -110,24 +121,54 @@ class PyMaze:
 
                     pygame.draw.rect(self.screen, color, [x, y, self.cell_size, self.cell_size])
 
+    def key_movement(self,key):
+        new_row, new_col = self.mov_row,self.mov_col
+        if key==pygame.K_LEFT: 
+            new_col-=1
+        if key==pygame.K_RIGHT: 
+            new_col+=1    
+        if key==pygame.K_UP: 
+            new_row-=1     
+        if key==pygame.K_DOWN: 
+            new_row+=1
+        
+        
+        if 0<=new_row<=len(self.matrix) and 0<=new_col<len(self.matrix):
+            if self.matrix[new_row][new_col]!='1':
+                self.matrix[self.mov_row][self.mov_col]='0'
+                self.redraw_visted_cell(self.mov_row, self.mov_col)
+                self.mov_row,self.mov_col = new_row,new_col
+                self.matrix[self.mov_row][self.mov_col]='x'
+                self.redraw_visted_cell(self.mov_row,self.mov_col)
+        if new_row==len(self.matrix)-1 and new_col==len(self.matrix)-1:
+            pass
 
-    def insert_image_in_maze(self, image_path,x,y):
-        wall = pygame.image.load(image_path).convert_alpha()
-        wall = pygame.transform.scale(wall, (self.cell_size, self.cell_size))
-        self.screen.blit(wall, (x, y))
+    
+    
+    def redraw_visted_cell(self, row, col):
+        x_offset = (self.width - len(self.matrix[0]) * (self.cell_size + self.margin)) // 2
+        y_offset = (self.height - len(self.matrix) * (self.cell_size + self.margin)) // 2
+
+        x = x_offset + col * (self.cell_size + self.margin)
+        y = y_offset + row * (self.cell_size + self.margin)
+
+        cell_value = self.matrix[row][col]
+
+        if cell_value == '1':
+            self.screen.blit(self.assets['wall'], (x, y))
+        elif cell_value == '0':
+            self.screen.blit(self.assets['path'], (x, y))
+        elif cell_value == 'x':
+            self.screen.blit(self.assets['jerry'], (x, y))
+        elif cell_value == 'y':
+            pygame.draw.rect(self.screen, (0, 255, 0), [x, y, self.cell_size, self.cell_size])
+        else:
+            pygame.draw.rect(self.screen, (0, 50, 50), [x, y, self.cell_size, self.cell_size])
+
+
+        
     
 
-    def key_movement(self):
-        keys = pygame.key.get_pressed()
-        start,end = self.loc[0][0],self.loc[0][1]
-
-        if keys[pygame.K_LEFT]: 
-            start+=1
-        if keys[pygame.K_RIGHT]: 
-            start+=1    
-        if keys[pygame.K_UP]: 
-            end-= 1     
-        if keys[pygame.K_DOWN]: 
-            end+= 1
-        self.insert_image_in_maze('assets/jerry.png',start,end)
-        pygame.display.update()
+        
+        
+        
