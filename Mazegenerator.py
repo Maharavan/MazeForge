@@ -24,8 +24,10 @@ class MazeGenerator:
                 self.maze_algo(cur_row, cur_col) 
             
     def generate_maze(self):
-        
-        self.maze_algo(0,0)
+        while True:
+            self.maze_algo(0,0)
+            if self.maze[self.row-1][self.column-1]==0:
+                break
         self.maze[0][0] = 'x'
         self.maze[self.row-1][self.column-1] = 'y'
         for i in range(self.row):
