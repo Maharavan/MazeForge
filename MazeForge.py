@@ -3,7 +3,7 @@ from pygame.locals import *
 import sys
 import time
 from HighScoreDB import HighScore
-class PyMaze:
+class MazeForge:
     def __init__(self, matrix):
         self.matrix = matrix
         self.height = 600
