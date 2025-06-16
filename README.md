@@ -97,5 +97,5 @@ See the [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
-**MazeForge** developed by [Your Name]  
-🔗 [LinkedIn/GitHub/Portfolio]
+**MazeForge** developed by Maharavan S  
+🔗 [LinkedIn](https://www.linkedin.com/in/maharavan-s/)
