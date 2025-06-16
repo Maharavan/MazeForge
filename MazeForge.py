@@ -164,6 +164,7 @@ class MazeForge:
             self.music_played = True
             self.gameover = True
 
+
     def append_score(self,scorepoint,height_gap):
         width = -50
         for score in scorepoint:
