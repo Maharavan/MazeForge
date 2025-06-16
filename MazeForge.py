@@ -164,13 +164,13 @@ class PyMaze:
             self.music_played = True
             self.gameover = True
 
-    def append_score(self, scorepoint,height_gap):
+    def append_score(self,scorepoint,height_gap):
         width = -50
         for score in scorepoint:
-            score = 'dot' if score=='.' else score
+            score, height = ('dot', 30) if score == '.' else (score, 25)
             out = pygame.transform.scale(pygame.image.load(f"assets/images/score_point/{score}.png").convert_alpha(), (25, 25))
             self.screen.blit(out, (self.width//2+width, self.height//2+height_gap))
-            width+=25
+            width+=15
             
     
     def redraw_visted_cell(self, row, col):
