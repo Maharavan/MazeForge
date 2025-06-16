@@ -7,21 +7,23 @@ class HighScore:
         self.db_name = 'HighScore.db'
         self.cursor = None
         self.table = None
+        self.sqlite_table = None
 
     def connection(self):
-        sqlite_table = sqlite3.connection(self.db_name)
-        self.cursor = sqlite_table.cursor()
+        self.sqlite_table = sqlite3.Connection(self.db_name)
+        self.cursor = self.sqlite_table.cursor()
         
     def create_table(self):
         self.connection()
         query = """
-                CREATE TABLE IF NOT EXIST HIGHSCORE (
+                CREATE TABLE IF NOT EXISTS HIGHSCORE (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                SCORE INTEGER NOT NULL
+                SCORE FLOAT NOT NULL
                 )
                 """
         self.cursor.execute(query)
         self.sqlite_table.commit()
+        self.sqlite_table.close()
 
     def insert_score(self,score):
         self.connection()
@@ -32,3 +34,15 @@ class HighScore:
                 """
         self.cursor.execute(query)
         self.sqlite_table.commit()
+        self.sqlite_table.close()
+
+    def highest_score(self):
+        self.connection()
+
+        query = f"""
+                SELECT MIN(SCORE) FROM HIGHSCORE
+                """
+        self.cursor.execute(query)
+        result = self.cursor.fetchone()
+        self.sqlite_table.close()
+        return result[0]
