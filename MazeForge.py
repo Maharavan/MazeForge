@@ -36,7 +36,6 @@ class PyMaze:
         
         game_begin = True
         while game_begin:
-            # pygame.time.delay(10)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     game_begin = False
@@ -147,18 +146,17 @@ class PyMaze:
         if not self.gameover:
             high = HighScore()
             high.create_table()
-            current_time = str(float("{:.2f}".format(time.time()-self.start_time)))
-            high.insert_score(len(self.matrix),(float("{:.2f}".format(time.time()-self.start_time))))
-            high.highest_score(len(self.matrix))
+            current_score = str(float("{:.2f}".format(time.time()-self.start_time)))
+            high.insert_score(len(self.matrix),float(current_score))
+            overall_score = str(high.highest_score(len(self.matrix)))
             self.screen.blit(self.assets['welcome'],(0,0))
 
             self.screen.blit(self.assets['gameover'], (self.width//2-200, self.height//2-250))
             self.screen.blit(self.assets['currentscore'], (self.width//2-150, self.height//2-100))
             self.screen.blit(self.assets['highscore'], (self.width//2-150, self.height//2))
             
-            font_style = pygame.font.SysFont('Arial',size=25)
-            font_text = font_style.render(current_time, False, (255, 255, 0))
-            self.screen.blit(font_text, (self.width//2-25,self.height//2-50))
+            self.append_score(current_score,80)
+            self.append_score(overall_score,180)
             pygame.mixer_music.stop()
             self.music_played=False
 
@@ -166,6 +164,14 @@ class PyMaze:
             self.music_played = True
             self.gameover = True
 
+    def append_score(self, scorepoint,height_gap):
+        width = -50
+        for score in scorepoint:
+            score = 'dot' if score=='.' else score
+            out = pygame.transform.scale(pygame.image.load(f"assets/images/score_point/{score}.png").convert_alpha(), (25, 25))
+            self.screen.blit(out, (self.width//2+width, self.height//2+height_gap))
+            width+=25
+            
     
     def redraw_visted_cell(self, row, col):
         x_offset = (self.width - len(self.matrix[0]) * (self.cell_size + self.margin)) // 2
@@ -192,12 +198,3 @@ class PyMaze:
             pygame.mixer.music.set_volume(0.7)
             pygame.mixer.music.play(-1)
             self.music_played = True
-        
-
-
-        
-    
-
-        
-        
-        
