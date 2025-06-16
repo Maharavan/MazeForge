@@ -148,8 +148,8 @@ class PyMaze:
             high = HighScore()
             high.create_table()
             current_time = str(float("{:.2f}".format(time.time()-self.start_time)))
-            high.insert_score((float("{:.2f}".format(time.time()-self.start_time))))
-            high.highest_score()
+            high.insert_score(len(self.matrix),(float("{:.2f}".format(time.time()-self.start_time))))
+            high.highest_score(len(self.matrix))
             self.screen.blit(self.assets['welcome'],(0,0))
 
             self.screen.blit(self.assets['gameover'], (self.width//2-200, self.height//2-250))
