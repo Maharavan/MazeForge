@@ -2,16 +2,19 @@ import pygame
 from pygame.locals import *
 import sys
 import time
+import random
 from HighScoreDB import HighScore
+from Mazegenerator import MazeGenerator
 class MazeForge:
-    def __init__(self, matrix):
-        self.matrix = matrix
+    def __init__(self):
+        self.matrix = None
         self.height = 600
         self.width = 1024
         self.screen = None
         self.fps = 60
         self.fpsClock = pygame.time.Clock()
         self.start_button_rect = None
+        self.difficulty_buttons = {}
         self.end_button_rect = None
         self.state = 'menu'
         self.cell_size = 35
@@ -25,14 +28,10 @@ class MazeForge:
     def invoke_game(self):
         pygame.init()
         self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption('MazeForge')
         self.assets_generator()
-        
-        try:
-            pygame.display.set_icon(self.assets['icon'])
-            pygame.display.set_caption('MazeForge')
-        except Exception as e:
-            print('Using default icon:', e)
+
+        pygame.display.set_icon(self.assets['icon'])
+        pygame.display.set_caption('MazeForge')
         
         game_begin = True
         while game_begin:
@@ -41,9 +40,18 @@ class MazeForge:
                     game_begin = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.start_button_rect and self.start_button_rect.collidepoint(event.pos):
-                        self.state = 'maze_create'
-                        pygame.mixer_music.stop()  
-                        self.music_played = False
+                            self.state = 'maze_create'
+                    elif self.state=='maze_create':
+                            for diff, rect in self.difficulty_buttons.items():
+                                if rect.collidepoint(event.pos):
+                                    print(diff[1])
+                                    maze = MazeGenerator(random.choice(diff[1]))
+                                    self.matrix = maze.generate_maze()
+                                    self.mov_row, self.mov_col = 0, 0  
+                                    self.state = 'game_begin'
+                                    pygame.mixer_music.stop()  
+                                    self.music_played = False
+                                    break   
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
@@ -54,6 +62,9 @@ class MazeForge:
             if self.state =='menu':
                 self.welcome_to_glitch_grid()
             elif self.state=='maze_create':
+                self.chose_difficulty()
+                # self.state='game_begin'
+            elif self.state=='game_begin':
                 self.create_box()  
                 self.start_time = time.time()
                 self.state='game'
@@ -86,10 +97,13 @@ class MazeForge:
             'jerry': pygame.transform.scale(pygame.image.load('assets/images/jerry.png').convert_alpha(), (self.cell_size, self.cell_size)),
             'cheese': pygame.transform.scale(pygame.image.load('assets/images/cheese.png').convert_alpha(), (self.cell_size, self.cell_size)),
             'icon': pygame.image.load('assets/images/icon.png').convert_alpha(),
-            'gameover':pygame.transform.scale(pygame.image.load('assets/images/gameover.png').convert(),(self.width,self.height)),
             'background':pygame.transform.scale(pygame.image.load('assets/images/background.png').convert(),(self.width,self.height)),
-            'welcome':pygame.transform.scale(pygame.image.load('assets/images/welcome.png').convert(),(self.width,self.height)),    
+            'welcome':pygame.transform.scale(pygame.image.load('assets/images/welcome.png').convert(),(self.width,self.height)), 
+            ('easy',(7,)):pygame.transform.scale(pygame.image.load('assets/images/easy.png').convert_alpha(),(100,100)),
+            ('medium',(9,11)):pygame.transform.scale(pygame.image.load('assets/images/medium.png').convert_alpha(),(100,100)),
+            ('hard',(13,)):pygame.transform.scale(pygame.image.load('assets/images/hard.png').convert_alpha(),(100,100)),
             'gameover':pygame.transform.scale(pygame.image.load('assets/images/gameover.png').convert_alpha(),(400,400)),
+            'choosesize':pygame.transform.scale(pygame.image.load('assets/images/difficulty.png').convert_alpha(),(300,300)),
             'highscore':pygame.transform.scale(pygame.image.load('assets/images/highscore.png').convert_alpha(),(300,300)),
             'currentscore':pygame.transform.scale(pygame.image.load('assets/images/score.png').convert_alpha(),(300,300)),
             'start_button':pygame.transform.scale(pygame.image.load('assets/images/start.png').convert_alpha(), (100, 100)),
@@ -145,7 +159,6 @@ class MazeForge:
     def game_over(self):
         if not self.gameover:
             high = HighScore()
-            high.create_table()
             current_score = str(float("{:.2f}".format(time.time()-self.start_time)))
             high.insert_score(len(self.matrix),float(current_score))
             overall_score = str(high.highest_score(len(self.matrix)))
@@ -199,3 +212,16 @@ class MazeForge:
             pygame.mixer.music.set_volume(0.7)
             pygame.mixer.music.play(-1)
             self.music_played = True
+    
+
+    def chose_difficulty(self):
+        self.screen.blit(self.assets['welcome'], (0, 0))
+        self.screen.blit(self.assets['choosesize'],(self.width//2-150, self.height//2-250))
+        difficulties = [('easy', (7,)), ('medium', (9, 11)), ('hard', (13,))]
+        x_positions = [self.width//2-200, self.width // 2,self.width // 2+200]
+
+        for diff, x_pos in zip(difficulties, x_positions):
+            button_rect = self.assets[diff].get_rect(center=(x_pos, self.height//2+50))
+            self.screen.blit(self.assets[diff], button_rect)
+            self.difficulty_buttons[diff] = button_rect
+
