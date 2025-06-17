@@ -100,7 +100,7 @@ class MazeForge:
             'background':pygame.transform.scale(pygame.image.load('assets/images/background.png').convert(),(self.width,self.height)),
             'welcome':pygame.transform.scale(pygame.image.load('assets/images/welcome.png').convert(),(self.width,self.height)), 
             ('easy',(7,)):pygame.transform.scale(pygame.image.load('assets/images/easy.png').convert_alpha(),(100,100)),
-            ('medium',(9,11)):pygame.transform.scale(pygame.image.load('assets/images/medium.png').convert_alpha(),(100,100)),
+            ('medium',(9,11)):pygame.transform.scale(pygame.image.load('assets/images/medium.png').convert_alpha(),(120,120)),
             ('hard',(13,)):pygame.transform.scale(pygame.image.load('assets/images/hard.png').convert_alpha(),(100,100)),
             'gameover':pygame.transform.scale(pygame.image.load('assets/images/gameover.png').convert_alpha(),(400,400)),
             'choosesize':pygame.transform.scale(pygame.image.load('assets/images/difficulty.png').convert_alpha(),(300,300)),
@@ -184,7 +184,7 @@ class MazeForge:
             score, height = ('dot', 30) if score == '.' else (score, 25)
             out = pygame.transform.scale(pygame.image.load(f"assets/images/score_point/{score}.png").convert_alpha(), (25, 25))
             self.screen.blit(out, (self.width//2+width, self.height//2+height_gap))
-            width+=15
+            width+=10
             
     
     def redraw_visted_cell(self, row, col):
