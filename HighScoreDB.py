@@ -8,6 +8,7 @@ class HighScore:
         self.cursor = None
         self.table = None
         self.sqlite_table = None
+        self.create_table()
 
     def connection(self):
         self.sqlite_table = sqlite3.Connection(self.db_name)

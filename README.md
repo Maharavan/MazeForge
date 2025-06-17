@@ -13,7 +13,7 @@ Built using **Pygame**, this interactive and visually engaging game challenges y
 - 📊 Real-time scoring and high-score tracking (SQLite)
 - 🎵 Background music & sound effects (start, play, game over)
 - 🖼️ Custom assets and images for immersive visuals
-- 🔁 Multiple maze sizes supported (adjustable)
+- 🔁 Multiple maze sizes (7x7, 9x9, 11x11, 13x13)
 - 💾 High scores saved across sessions
 
 ---
@@ -39,11 +39,16 @@ pip install pygame
    python app.py
    ```
 
-2. Click the **Start** button to generate a maze.
-3. Use arrow keys (`↑ ↓ ← →`) to move Jerry through the maze.
-4. Reach the cheese located at the bottom-right corner.
-5. Score is calculated based on the time taken — lower is better!
-6. View your current and best scores at the end screen.
+2. Click the **Start** button to begin.
+3. Select your preferred **maze size**:  
+   - `7x7` — Easy  
+   - `9x9`,`11x11` — Medium  
+   - `13x13` — Hard  
+
+4. Use arrow keys (`↑ ↓ ← →`) to move Jerry through the maze.
+5. Reach the cheese located at the bottom-right corner.
+6. Score is calculated based on the time taken — lower is better!
+7. View your current and best scores at the end screen.
 
 ---
 
@@ -75,17 +80,17 @@ MazeForge/
 
 ## 🛠️ Customization
 
-- You can adjust the `cell_size` and `margin` in `MazeForge.py` to fit different grid sizes.
-- Maze difficulty can be increased by increasing grid size in `MazeGenerator`.
+- Adjust `cell_size` and `margin` in `MazeForge.py` to tweak spacing.
+- Modify `MazeGenerator` to explore alternative algorithms like Prim's or Kruskal’s.
+- Add new difficulty levels by simply introducing more grid sizes and corresponding images.
 
 ---
 
 ## ✨ Future Enhancements
 
-- Timer countdown mode
-- Leaderboard across multiple sessions
-- Character animations
-- Multiple levels
+- ⏲️ Timer countdown mode
+- 🕹️ Character animations & effects
+- 🗺️ Procedurally generated themed mazes (forest, dungeon, etc.)
 ---
 
 ## 📃 License
@@ -99,3 +104,4 @@ See the [LICENSE](LICENSE) file for details.
 
 **MazeForge** developed by Maharavan S  
 🔗 [LinkedIn](https://www.linkedin.com/in/maharavan-s/)
+
