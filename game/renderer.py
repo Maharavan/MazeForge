@@ -69,6 +69,9 @@ class Renderer:
         self.screen.blit(self.assets['highscore'], (WIDTH//2 - 97, HEIGHT//2))
         self._draw_score(current_score, 25)
         self._draw_score(high_score, 125)
+        restart_button = self.assets['restart_button'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
+        self.screen.blit(self.assets['restart_button'], restart_button)
+        return restart_button
 
     def _draw_score(self, score, y_offset):
         x = -30

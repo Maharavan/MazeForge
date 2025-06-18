@@ -23,10 +23,10 @@ def load_assets(cell_size, width, height):
         'gameover': pygame.transform.scale(pygame.image.load('assets/images/gameover.png').convert_alpha(), (300, 300)),
         'choosesize': pygame.transform.scale(pygame.image.load('assets/images/difficulty.png').convert_alpha(), (200, 200)),
         'character': pygame.transform.scale(pygame.image.load('assets/images/character.png').convert_alpha(), (200, 200)),
-
         'highscore': pygame.transform.scale(pygame.image.load('assets/images/highscore.png').convert_alpha(), (200, 200)),
         'currentscore': pygame.transform.scale(pygame.image.load('assets/images/score.png').convert_alpha(), (200, 200)),
         'start_button': pygame.transform.scale(pygame.image.load('assets/images/start.png').convert_alpha(), (100, 100)),
-        'end_button': pygame.transform.scale(pygame.image.load('assets/images/quit.png').convert_alpha(), (100, 100))
+        'end_button': pygame.transform.scale(pygame.image.load('assets/images/quit.png').convert_alpha(), (100, 100)),
+        'restart_button':pygame.transform.scale(pygame.image.load('assets/images/restart.png').convert_alpha(), (200, 200)),
     }
 

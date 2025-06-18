@@ -31,6 +31,7 @@ class MazeForge:
         self.player = Player()
         self.start_time = None
         self.gameover = False
+        self.restart_button_rect = None
 
     def invoke_game(self):
         pygame.init()
@@ -68,6 +69,14 @@ class MazeForge:
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
+                    elif self.restart_button_rect and self.restart_button_rect.collidepoint(event.pos):
+                        self.sound_manager.stop_music()
+                        self.sound_manager.play_music('assets/sound/game-intro.mp3')
+                        self.state = 'difficulty_option'
+                        self.matrix = None
+                        self.player.reset()
+                        self.start_time = None
+                        self.gameover = False
                 elif event.type == pygame.KEYDOWN and self.state == 'game':
                     self.sound_manager.play_music('assets/sound/game-begins.mp3')
                     self.player.move(event.key, self.matrix, self.renderer,self.character_image,self.char_end)
@@ -86,13 +95,7 @@ class MazeForge:
             elif self.player.has_won(self.matrix):
                 self.game_over()
                 self.state = 'game_over'
-            elif self.state == 'game_over':
-                self.state = 'menu'
-                self.matrix = None
-                self.player.reset()
-                self.start_time = None
-                self.gameover = False
-
+                
             pygame.display.flip()
             self.fpsClock.tick(self.fps)
         pygame.quit()
@@ -103,7 +106,7 @@ class MazeForge:
             current_score = str(float("{:.2f}".format(time.time() - self.start_time)))
             high.insert_score(len(self.matrix), float(current_score))
             overall_score = str(high.highest_score(len(self.matrix)))
-            self.renderer.draw_game_over(current_score, overall_score)
+            self.restart_button_rect=self.renderer.draw_game_over(current_score, overall_score)
 
             self.sound_manager.stop_music()
             self.sound_manager.play_music('assets/sound/game-over.mp3', loop=0)
