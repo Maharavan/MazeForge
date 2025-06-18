@@ -48,5 +48,4 @@ class HighScore:
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         self.sqlite_table.close()
-        print(result[0])
         return result[0]

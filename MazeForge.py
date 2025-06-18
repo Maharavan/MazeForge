@@ -44,7 +44,6 @@ class MazeForge:
                     elif self.state=='maze_create':
                             for diff, rect in self.difficulty_buttons.items():
                                 if rect.collidepoint(event.pos):
-                                    print(diff[1])
                                     maze = MazeGenerator(random.choice(diff[1]))
                                     self.matrix = maze.generate_maze()
                                     self.mov_row, self.mov_col = 0, 0  
@@ -63,7 +62,6 @@ class MazeForge:
                 self.welcome_to_glitch_grid()
             elif self.state=='maze_create':
                 self.chose_difficulty()
-                # self.state='game_begin'
             elif self.state=='game_begin':
                 self.create_box()  
                 self.start_time = time.time()
@@ -71,6 +69,13 @@ class MazeForge:
             elif self.mov_row==len(self.matrix)-1 and self.mov_col==len(self.matrix)-1:
                 self.game_over()
                 self.state='game_over'
+            elif self.state=='game_over':
+                self.state = 'menu'
+                self.matrix = None
+                self.mov_row = 0
+                self.mov_col = 0
+                self.start_time = None
+                self.gameover = False
             pygame.display.flip()
             self.fpsClock.tick(self.fps)
         pygame.quit()
@@ -122,18 +127,7 @@ class MazeForge:
         
         for row in range(rows):
             for cols in range(columns):
-                x = x_offset + cols * (self.cell_size + self.margin)
-                y = y_offset + row * (self.cell_size + self.margin)
-                cell_value = self.matrix[row][cols]
-
-                if cell_value == '1':
-                    self.screen.blit(self.assets['wall'], (x, y))
-                elif cell_value == 'x':
-                    self.screen.blit(self.assets['jerry'], (x, y))
-                elif cell_value == 'y':
-                    self.screen.blit(self.assets['cheese'], (x, y))
-                else:
-                    self.screen.blit(self.assets['path'], (x, y))
+                self.redraw_visted_cell(row,cols)
 
     def key_movement(self,key):
         new_row, new_col = self.mov_row,self.mov_col
@@ -184,7 +178,7 @@ class MazeForge:
             score, height = ('dot', 30) if score == '.' else (score, 25)
             out = pygame.transform.scale(pygame.image.load(f"assets/images/score_point/{score}.png").convert_alpha(), (25, 25))
             self.screen.blit(out, (self.width//2+width, self.height//2+height_gap))
-            width+=10
+            width+=13
             
     
     def redraw_visted_cell(self, row, col):
