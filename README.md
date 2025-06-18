@@ -1,30 +1,27 @@
+# 🤩 MazeForge - Full Game
 
-# 🧩 MazeForge
-
-**MazeForge** is a classic maze-solving game where 🐭 Jerry navigates through a maze to reach his delicious reward — 🧀 cheese!  
-Built using **Pygame**, this interactive and visually engaging game challenges your reflexes, logic, and timing with real-time scoring and dynamic graphics.
+**MazeForge** is a character-based maze game developed using Python and Pygame. Players can choose between Jerry 🐭, Spike 🐶, or Tom 🐱, and solve mazes of increasing difficulty. The game features real-time scoring, background music, high score tracking, and intelligent maze generation.
 
 ---
 
 ## 🎮 Features
 
-- 🧠 Intelligent maze generation using DFS
-- 🐭 Character-based gameplay with Jerry and Cheese
-- 📊 Real-time scoring and high-score tracking (SQLite)
-- 🎵 Background music & sound effects (start, play, game over)
-- 🖼️ Custom assets and images for immersive visuals
-- 🔁 Multiple maze sizes (7x7, 9x9, 11x11, 13x13)
-- 💾 High scores saved across sessions
+* 🧠 Maze generation using DFS algorithm
+* 🐭 Character selection: Jerry (Easy), Spike (Medium), Tom (Hard)
+* 🎵 Integrated background music and sound effects
+* 📊 Score tracking and SQLite-based high score saving
+* 🖼️ Custom assets (images and audio)
+* 🌐 Dynamic menu, difficulty, and character selection screens
 
 ---
 
 ## 📦 Requirements
 
-- Python 3.6+
-- Pygame
-- SQLite3 (standard in Python)
+* Python 3.6+
+* Pygame
+* SQLite3 (comes with Python)
 
-Install dependencies using:
+Install Pygame:
 
 ```bash
 pip install pygame
@@ -32,76 +29,92 @@ pip install pygame
 
 ---
 
-## 🚀 How to Play
+## 🚀 How to Run
 
-1. Run the game:
-   ```bash
-   python app.py
-   ```
+1. Launch the game using:
 
-2. Click the **Start** button to begin.
-3. Select your preferred **maze size**:  
-   - `7x7` — Easy  
-   - `9x9`,`11x11` — Medium  
-   - `13x13` — Hard  
+```bash
+python app.py
+```
 
-4. Use arrow keys (`↑ ↓ ← →`) to move Jerry through the maze.
-5. Reach the cheese located at the bottom-right corner.
-6. Score is calculated based on the time taken — lower is better!
-7. View your current and best scores at the end screen.
+2. On the menu:
+
+   * Click **Start** to play
+   * Choose a maze size: Easy (7x7), Medium (9x9, 11x11), Hard (13x13)
+   * Select a character: Jerry, Spike, or Tom
+3. Navigate the maze using arrow keys: `↑ ↓ ← →`
+4. Reach the goal to win and see your score!
 
 ---
 
-## 🗂️ Project Structure
+## 📂 Project Structure
 
 ```
 MazeForge/
-│
 ├── assets/
-│   ├── images/
-│   │   ├── wall.png
-│   │   ├── path.png
-│   │   ├── jerry.png
-│   │   ├── cheese.png
-│   │   └── ...
-│   ├── sound/
-│       ├── game-intro.mp3
-│       ├── game-begins.mp3
-│       └── game-over.mp3
-│
-├── HighScoreDB.py        # SQLite score management
-├── MazeGenerator.py      # DFS maze generator
-├── MazeForge.py          # Main game logic
-├── app.py                # Entry point
-└── README.md             # This file
+│   ├── images/          # Game visuals (maze, characters, UI)
+│   ├── sound/           # Sound effects and background music
+├── game/
+│   ├── maze_forge.py    # Main game loop and logic
+│   ├── assets_loader.py # Loads images and sounds
+│   ├── constants.py     # Screen dimensions, FPS
+│   ├── player.py        # Player control and movement
+│   ├── renderer.py      # Handles drawing the game
+│   └── sound_manager.py # Music/sound control
+├── HighScoreDB.py       # SQLite high score handler
+├── Mazegenerator.py     # DFS-based maze generator
+├── app.py               # Game entry point
+└── README.md            # This file
 ```
 
 ---
 
-## 🛠️ Customization
+## 🛠️ Technical Highlights
 
-- Adjust `cell_size` and `margin` in `MazeForge.py` to tweak spacing.
-- Modify `MazeGenerator` to explore alternative algorithms like Prim's or Kruskal’s.
-- Add new difficulty levels by simply introducing more grid sizes and corresponding images.
+### MazeGenerator (DFS)
+
+* Carves out random paths from the top-left to bottom-right.
+* Ensures maze solvability.
+* Marks player start (`'x'`) and end (`'y'`) positions.
+
+### Renderer
+
+* Renders menus, characters, maze, game over screen.
+* Dynamically scales images based on maze size.
+
+### Player
+
+* Handles key input and collision detection.
+* Knows when the goal is reached.
+
+### SoundManager
+
+* Plays/stops looping music for intro, in-game, and game over.
+
+### HighScoreDB
+
+* Stores scores in `HighScore.db`.
+* Tracks and displays best scores by maze size.
 
 ---
 
-## ✨ Future Enhancements
+## ✨ Planned Enhancements
 
-- ⏲️ Timer countdown mode
-- 🕹️ Character animations & effects
-- 🗺️ Procedurally generated themed mazes (forest, dungeon, etc.)
+* ⏲️ Timer countdown mode
+* 🕹️ Animated character sprites
+* 🌳 Themed mazes: forest, desert, space, etc.
+* 🌐 Web version (using Pyodide or Pygbag)
+
 ---
 
 ## 📃 License
 
-This project is licensed under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.
+See the [LICENSE](LICENSE) file for full details.
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💼 Author
 
-**MazeForge** developed by Maharavan S  
+Developed by **Maharavan S**
 🔗 [LinkedIn](https://www.linkedin.com/in/maharavan-s/)
-

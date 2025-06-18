@@ -21,6 +21,9 @@ class MazeForge:
         self.start_button_rect = None
         self.difficulty_buttons = {}
         self.end_button_rect = None
+        self.chose_character = {}
+        self.character_image = None
+        self.char_end = None
         self.state = 'menu'
         self.cell_size = 35
         self.margin = 5
@@ -45,30 +48,39 @@ class MazeForge:
                     game_begin = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.start_button_rect and self.start_button_rect.collidepoint(event.pos):
-                        self.state = 'maze_create'
-                    elif self.state == 'maze_create':
+                        self.state = 'difficulty_option'
+                    elif self.state == 'difficulty_option':
                         for diff, rect in self.difficulty_buttons.items():
                             if rect.collidepoint(event.pos):
                                 maze = MazeGenerator(random.choice(diff[1]))
                                 self.matrix = maze.generate_maze()
                                 self.player.reset()
-                                self.state = 'game_begin'
+                                self.state = 'chose_character'
+                                break
+                    elif self.state=='chose_character':
+                        for diff, rect in self.chose_character.items():
+                            if rect.collidepoint(event.pos):
+                                self.character_image = diff[0]
+                                self.char_end = diff[1]
                                 self.sound_manager.stop_music()
+                                self.state = 'game_begin'
                                 break
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
                 elif event.type == pygame.KEYDOWN and self.state == 'game':
                     self.sound_manager.play_music('assets/sound/game-begins.mp3')
-                    self.player.move(event.key, self.matrix, self.renderer)
+                    self.player.move(event.key, self.matrix, self.renderer,self.character_image,self.char_end)
 
             if self.state == 'menu':
                 self.sound_manager.play_music("assets/sound/game-intro.mp3")
                 self.start_button_rect, self.end_button_rect = self.renderer.draw_menu()
-            elif self.state == 'maze_create':
+            elif self.state == 'chose_character':
+                self.chose_character = self.renderer.draw_character()
+            elif self.state == 'difficulty_option':
                 self.difficulty_buttons = self.renderer.draw_difficulty_screen()
             elif self.state == 'game_begin':
-                self.renderer.draw_maze(self.matrix)
+                self.renderer.draw_maze(self.matrix,self.character_image, self.char_end)
                 self.start_time = time.time()
                 self.state = 'game'
             elif self.player.has_won(self.matrix):
