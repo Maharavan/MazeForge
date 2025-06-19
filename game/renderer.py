@@ -29,7 +29,7 @@ class Renderer:
             buttons[diff] = rect
         return buttons
 
-    def draw_difficulty_screen(self):
+    def draw_difficulty_screen(self,difficulties):
         self.screen.blit(self.assets['welcome'], (0, 0))
         self.screen.blit(self.assets['choosesize'], (WIDTH//2 - 100, HEIGHT//2 - 170))
         difficulties = [('easy', (7,)), ('medium', (9, 11)), ('hard', (13,))]
