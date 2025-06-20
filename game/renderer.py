@@ -1,6 +1,7 @@
+from collections import deque
 import pygame
 from .constants import WIDTH, HEIGHT, FPS
-
+from HighScoreDB import HighScore
 class Renderer:
     def __init__(self, screen, assets, cell_size, margin):
         self.screen = screen
@@ -14,7 +15,10 @@ class Renderer:
         self.screen.blit(self.assets['start_button'], start_rect)
         end_rect = self.assets['end_button'].get_rect(center=(WIDTH//2 + 100, HEIGHT//2))
         self.screen.blit(self.assets['end_button'], end_rect)
-        return start_rect, end_rect
+        leader_board_rect = self.assets['leaderboard'].get_rect(center=(WIDTH//2, HEIGHT//2+180))
+        self.screen.blit(self.assets['leaderboard'],leader_board_rect)
+
+        return start_rect, end_rect, leader_board_rect
     
     def draw_character(self):
         self.screen.blit(self.assets['welcome'], (0, 0))
@@ -29,10 +33,9 @@ class Renderer:
             buttons[diff] = rect
         return buttons
 
-    def draw_difficulty_screen(self):
+    def draw_difficulty_screen(self, difficulties):
         self.screen.blit(self.assets['welcome'], (0, 0))
         self.screen.blit(self.assets['choosesize'], (WIDTH//2 - 100, HEIGHT//2 - 170))
-        difficulties = [('easy', (7,)), ('medium', (9, 11)), ('hard', (13,))]
         x_positions = [WIDTH//2 - 200, WIDTH//2, WIDTH//2 + 200]
         buttons = {}
         for diff, x in zip(difficulties, x_positions):
@@ -67,18 +70,35 @@ class Renderer:
         self.screen.blit(self.assets['gameover'], (WIDTH//2-150, HEIGHT//2 - 220))
         self.screen.blit(self.assets['currentscore'], (WIDTH//2 - 100, HEIGHT//2 - 100))
         self.screen.blit(self.assets['highscore'], (WIDTH//2 - 97, HEIGHT//2))
-        self._draw_score(current_score, 25)
-        self._draw_score(high_score, 125)
-        restart_button = self.assets['restart_button'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
-        self.screen.blit(self.assets['restart_button'], restart_button)
-        return restart_button
+        self._draw_score(current_score, -30, 25)
+        self._draw_score(high_score, -30,125)
 
-    def _draw_score(self, score, y_offset):
-        x = -30
+        menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
+        self.screen.blit(self.assets['menu'], menu_button)
+        return menu_button
+
+    def _draw_score(self, score, x_offset, y_offset):
         for char in score:
             image_name = 'dot' if char == '.' else char
             img = pygame.transform.scale(
                 pygame.image.load(f"assets/images/score_point/{image_name}.png").convert_alpha(), (25, 25)
             )
-            self.screen.blit(img, (WIDTH//2 + x, HEIGHT//2 + y_offset))
-            x += 13
+            self.screen.blit(img, (WIDTH//2 + x_offset, HEIGHT//2 + y_offset))
+            x_offset += 13
+    
+    def _draw_leader_board(self):
+        data_diff = HighScore()
+        output = data_diff.retrieve_highest_score()
+        self.screen.blit(self.assets['welcome'], (0, 0))
+        self.screen.blit(self.assets['leaderboard'],(WIDTH//2-100,HEIGHT//2-200))
+        self.screen.blit(self.assets[('easy',(7,))], (WIDTH//2-200, HEIGHT//2-75))
+        self.screen.blit(self.assets[('medium',(9,11))], (WIDTH//2-200, HEIGHT//2))
+        self.screen.blit(self.assets[('hard',(13,))],(WIDTH//2-200, HEIGHT//2+100))
+        y_offset_list = deque([-40,45,140])
+        
+        for out in output.values():
+            offset = y_offset_list.popleft()
+            self._draw_score(str(out),100,offset)
+        menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
+        self.screen.blit(self.assets['menu'], menu_button)
+        return menu_button
