@@ -30,7 +30,9 @@ class MazeForge:
         self.sound_manager = SoundManager()
         self.player = Player()
         self.start_time = None
+        self.difficulty = [('easy', (7,)), ('medium', (9, 11)), ('hard', (13,))]
         self.gameover = False
+        self.leaderboardrect = None
         self.restart_button_rect = None
 
     def invoke_game(self):
@@ -69,32 +71,39 @@ class MazeForge:
                     elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
+                        
                     elif self.restart_button_rect and self.restart_button_rect.collidepoint(event.pos):
                         self.sound_manager.stop_music()
                         self.sound_manager.play_music('assets/sound/game-intro.mp3')
-                        self.state = 'difficulty_option'
+                        self.state = 'menu'
                         self.matrix = None
                         self.player.reset()
                         self.start_time = None
                         self.gameover = False
+                    elif self.leaderboardrect and self.leaderboardrect.collidepoint(event.pos):
+                        self.state='leaderboard'
+                        
                 elif event.type == pygame.KEYDOWN and self.state == 'game':
                     self.sound_manager.play_music('assets/sound/game-begins.mp3')
                     self.player.move(event.key, self.matrix, self.renderer,self.character_image,self.char_end)
 
             if self.state == 'menu':
                 self.sound_manager.play_music("assets/sound/game-intro.mp3")
-                self.start_button_rect, self.end_button_rect = self.renderer.draw_menu()
+                self.start_button_rect, self.end_button_rect, self.leaderboardrect = self.renderer.draw_menu()
             elif self.state == 'chose_character':
                 self.chose_character = self.renderer.draw_character()
             elif self.state == 'difficulty_option':
-                self.difficulty_buttons = self.renderer.draw_difficulty_screen()
+                self.difficulty_buttons = self.renderer.draw_difficulty_screen(self.difficulty)
             elif self.state == 'game_begin':
                 self.renderer.draw_maze(self.matrix,self.character_image, self.char_end)
                 self.start_time = time.time()
                 self.state = 'game'
+            elif self.state=='leaderboard':
+                self.renderer._draw_leader_board()
             elif self.player.has_won(self.matrix):
                 self.game_over()
                 self.state = 'game_over'
+        
                 
             pygame.display.flip()
             self.fpsClock.tick(self.fps)
@@ -104,9 +113,13 @@ class MazeForge:
         if not self.gameover:
             high = HighScore()
             current_score = str(float("{:.2f}".format(time.time() - self.start_time)))
-            high.insert_score(len(self.matrix), float(current_score))
-            overall_score = str(high.highest_score(len(self.matrix)))
+            for diff,size in self.difficulty:
+                if len(self.matrix) in size: 
+                    high.insert_score(diff, float(current_score))
+                    overall_score = str(high.highest_score(diff))
+                    break
             self.restart_button_rect=self.renderer.draw_game_over(current_score, overall_score)
+            print(self.restart_button_rect)
 
             self.sound_manager.stop_music()
             self.sound_manager.play_music('assets/sound/game-over.mp3', loop=0)

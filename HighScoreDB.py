@@ -19,7 +19,7 @@ class HighScore:
         query = """
                 CREATE TABLE IF NOT EXISTS HIGHSCORE (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                MAZESIZE INTEGER NOT NULL,
+                DIFFICULTY TEXT,
                 SCORE FLOAT NOT NULL
                 )
                 """
@@ -27,25 +27,35 @@ class HighScore:
         self.sqlite_table.commit()
         self.sqlite_table.close()
 
-    def insert_score(self,mazesize, score):
+    def insert_score(self,difficulty, score):
         self.connection()
 
         query = f"""
-                INSERT INTO HIGHSCORE(MAZESIZE,SCORE)
-                VALUES ({mazesize},{score})
+                INSERT INTO HIGHSCORE(DIFFICULTY,SCORE)
+                VALUES (?,?)
                 """
-        self.cursor.execute(query)
+        self.cursor.execute(query,(difficulty,score))
         self.sqlite_table.commit()
         self.sqlite_table.close()
 
-    def highest_score(self,mazesize):
+    def highest_score(self,difficulty):
         self.connection()
 
         query = f"""
                 SELECT MIN(SCORE) FROM HIGHSCORE
-                WHERE MAZESIZE IN ({mazesize})
+                WHERE DIFFICULTY IN (?)
                 """
-        self.cursor.execute(query)
+        self.cursor.execute(query,(difficulty,))
         result = self.cursor.fetchone()
         self.sqlite_table.close()
         return result[0]
+    
+    def retrieve_highest_score(self):
+        self.connection()
+        diff = {'easy':'0.00','medium':'0.00','hard':'0.00'}
+        for mode in diff:
+            res = self.highest_score(mode)
+            diff[mode]= res if res!=None else diff[mode]
+        return diff
+
+
