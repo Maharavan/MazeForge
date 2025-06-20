@@ -1,3 +1,4 @@
+from collections import deque
 import pygame
 from .constants import WIDTH, HEIGHT, FPS
 from HighScoreDB import HighScore
@@ -72,9 +73,9 @@ class Renderer:
         self._draw_score(current_score, 25)
         self._draw_score(high_score, 125)
 
-        restart_button = self.assets['restart_button'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
-        self.screen.blit(self.assets['restart_button'], restart_button)
-        return restart_button
+        menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
+        self.screen.blit(self.assets['menu'], menu_button)
+        return menu_button
 
     def _draw_score(self, score, y_offset):
         x = -30
@@ -93,7 +94,13 @@ class Renderer:
 
         self.screen.blit(self.assets['welcome'], (0, 0))
         self.screen.blit(self.assets['leaderboard'],(WIDTH//2-100,HEIGHT//2-200))
-
         self.screen.blit(self.assets[('easy',(7,))], (WIDTH//2-200, HEIGHT//2-75))
         self.screen.blit(self.assets[('medium',(9,11))], (WIDTH//2-200, HEIGHT//2))
         self.screen.blit(self.assets[('hard',(13,))],(WIDTH//2-200, HEIGHT//2+100))
+        y_offset_list = deque([-75,0,100])
+        for out in output.values():
+            offset = y_offset_list.popleft()
+            self._draw_score(str(out),offset)
+        menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
+        self.screen.blit(self.assets['menu'], menu_button)
+        return menu_button

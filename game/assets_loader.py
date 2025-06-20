@@ -27,7 +27,7 @@ def load_assets(cell_size, width, height):
         'currentscore': pygame.transform.scale(pygame.image.load('assets/images/score.png').convert_alpha(), (200, 200)),
         'start_button': pygame.transform.scale(pygame.image.load('assets/images/start.png').convert_alpha(), (100, 100)),
         'end_button': pygame.transform.scale(pygame.image.load('assets/images/quit.png').convert_alpha(), (100, 100)),
-        'restart_button':pygame.transform.scale(pygame.image.load('assets/images/restart.png').convert_alpha(), (150, 150)),
+        'menu':pygame.transform.scale(pygame.image.load('assets/images/menu.png').convert_alpha(), (150, 150)),
         'leaderboard':pygame.transform.scale(pygame.image.load('assets/images/leaderboard.png').convert_alpha(), (200, 200)),
 
     }

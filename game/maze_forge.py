@@ -10,6 +10,7 @@ from .renderer import Renderer
 from HighScoreDB import HighScore
 from Mazegenerator import MazeGenerator
 
+
 class MazeForge:
     def __init__(self):
         self.matrix = None
@@ -33,7 +34,17 @@ class MazeForge:
         self.difficulty = [('easy', (7,)), ('medium', (9, 11)), ('hard', (13,))]
         self.gameover = False
         self.leaderboardrect = None
-        self.restart_button_rect = None
+        self.menu_button_rect = None
+        self.current_music = None  # new: track current music
+
+    def reset_game_state(self):
+        self.state = 'menu'
+        self.matrix = None
+        self.player.reset()
+        self.start_time = None
+        self.gameover = False
+        self.current_music = None
+        self.sound_manager.stop_music()
 
     def invoke_game(self):
         pygame.init()
@@ -49,78 +60,95 @@ class MazeForge:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_begin = False
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.start_button_rect and self.start_button_rect.collidepoint(event.pos):
-                        self.state = 'difficulty_option'
+                    pos = event.pos
+
+                    if self.state == 'menu':
+                        if self.start_button_rect and self.start_button_rect.collidepoint(pos):
+                            self.state = 'difficulty_option'
+                        elif self.end_button_rect and self.end_button_rect.collidepoint(pos):
+                            pygame.quit()
+                            sys.exit()
+                        elif self.leaderboardrect and self.leaderboardrect.collidepoint(pos):
+                            self.state = 'leaderboard'
+
                     elif self.state == 'difficulty_option':
                         for diff, rect in self.difficulty_buttons.items():
-                            if rect.collidepoint(event.pos):
+                            if rect.collidepoint(pos):
                                 maze = MazeGenerator(random.choice(diff[1]))
                                 self.matrix = maze.generate_maze()
                                 self.player.reset()
                                 self.state = 'chose_character'
                                 break
-                    elif self.state=='chose_character':
+
+                    elif self.state == 'chose_character':
                         for diff, rect in self.chose_character.items():
-                            if rect.collidepoint(event.pos):
+                            if rect.collidepoint(pos):
                                 self.character_image = diff[0]
                                 self.char_end = diff[1]
                                 self.sound_manager.stop_music()
+                                self.current_music = None
                                 self.state = 'game_begin'
                                 break
-                    elif self.end_button_rect and self.end_button_rect.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
-                        
-                    elif self.restart_button_rect and self.restart_button_rect.collidepoint(event.pos):
-                        self.sound_manager.stop_music()
-                        self.sound_manager.play_music('assets/sound/game-intro.mp3')
-                        self.state = 'menu'
-                        self.matrix = None
-                        self.player.reset()
-                        self.start_time = None
-                        self.gameover = False
-                    elif self.leaderboardrect and self.leaderboardrect.collidepoint(event.pos):
-                        self.state='leaderboard'
-                        
-                elif event.type == pygame.KEYDOWN and self.state == 'game':
-                    self.sound_manager.play_music('assets/sound/game-begins.mp3')
-                    self.player.move(event.key, self.matrix, self.renderer,self.character_image,self.char_end)
 
+                    elif self.state == 'game_over':
+                        if self.menu_button_rect and self.menu_button_rect.collidepoint(pos):
+                            self.reset_game_state()
+
+                    elif self.state == 'leaderboard':
+                        if self.menu_button_rect and self.menu_button_rect.collidepoint(pos):
+                            self.reset_game_state()
+
+                elif event.type == pygame.KEYDOWN:
+                    if self.state == 'game_begin':
+                        self.start_time = time.time()
+                        self.sound_manager.stop_music()
+                        self.sound_manager.play_music("assets/sound/game-begins.mp3", loop=-1)
+                        self.current_music = 'game'
+                        self.state = 'game'
+                        self.player.move(event.key, self.matrix, self.renderer, self.character_image, self.char_end)
+                    elif self.state == 'game':
+                        self.player.move(event.key, self.matrix, self.renderer, self.character_image, self.char_end)
             if self.state == 'menu':
-                self.sound_manager.play_music("assets/sound/game-intro.mp3")
+                if self.current_music != 'menu':
+                    self.sound_manager.stop_music()
+                    self.sound_manager.play_music("assets/sound/game-intro.mp3", loop=-1)
+                    self.current_music = 'menu'
                 self.start_button_rect, self.end_button_rect, self.leaderboardrect = self.renderer.draw_menu()
-            elif self.state == 'chose_character':
-                self.chose_character = self.renderer.draw_character()
+
             elif self.state == 'difficulty_option':
                 self.difficulty_buttons = self.renderer.draw_difficulty_screen(self.difficulty)
+
+            elif self.state == 'chose_character':
+                self.chose_character = self.renderer.draw_character()
+
             elif self.state == 'game_begin':
-                self.renderer.draw_maze(self.matrix,self.character_image, self.char_end)
-                self.start_time = time.time()
-                self.state = 'game'
-            elif self.state=='leaderboard':
-                self.renderer._draw_leader_board()
+                self.renderer.draw_maze(self.matrix, self.character_image, self.char_end)
+
+            elif self.state == 'leaderboard':
+                self.menu_button_rect = self.renderer._draw_leader_board()
+
             elif self.player.has_won(self.matrix):
                 self.game_over()
                 self.state = 'game_over'
-        
-                
+
             pygame.display.flip()
             self.fpsClock.tick(self.fps)
+
         pygame.quit()
 
     def game_over(self):
         if not self.gameover:
             high = HighScore()
             current_score = str(float("{:.2f}".format(time.time() - self.start_time)))
-            for diff,size in self.difficulty:
-                if len(self.matrix) in size: 
+            for diff, size in self.difficulty:
+                if len(self.matrix) in size:
                     high.insert_score(diff, float(current_score))
                     overall_score = str(high.highest_score(diff))
                     break
-            self.restart_button_rect=self.renderer.draw_game_over(current_score, overall_score)
-            print(self.restart_button_rect)
-
+            self.menu_button_rect = self.renderer.draw_game_over(current_score, overall_score)
             self.sound_manager.stop_music()
-            self.sound_manager.play_music('assets/sound/game-over.mp3', loop=0)
+            self.sound_manager.play_music('assets/sound/game-over.mp3', loop=-1)
+            self.current_music = 'game_over'
             self.gameover = True
