@@ -70,37 +70,35 @@ class Renderer:
         self.screen.blit(self.assets['gameover'], (WIDTH//2-150, HEIGHT//2 - 220))
         self.screen.blit(self.assets['currentscore'], (WIDTH//2 - 100, HEIGHT//2 - 100))
         self.screen.blit(self.assets['highscore'], (WIDTH//2 - 97, HEIGHT//2))
-        self._draw_score(current_score, 25)
-        self._draw_score(high_score, 125)
+        self._draw_score(current_score, -30, 25)
+        self._draw_score(high_score, -30,125)
 
         menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
         self.screen.blit(self.assets['menu'], menu_button)
         return menu_button
 
-    def _draw_score(self, score, y_offset):
-        x = -30
+    def _draw_score(self, score, x_offset, y_offset):
         for char in score:
             image_name = 'dot' if char == '.' else char
             img = pygame.transform.scale(
                 pygame.image.load(f"assets/images/score_point/{image_name}.png").convert_alpha(), (25, 25)
             )
-            self.screen.blit(img, (WIDTH//2 + x, HEIGHT//2 + y_offset))
-            x += 13
+            self.screen.blit(img, (WIDTH//2 + x_offset, HEIGHT//2 + y_offset))
+            x_offset += 13
     
     def _draw_leader_board(self):
         data_diff = HighScore()
         output = data_diff.retrieve_highest_score()
-        print(output)
-
         self.screen.blit(self.assets['welcome'], (0, 0))
         self.screen.blit(self.assets['leaderboard'],(WIDTH//2-100,HEIGHT//2-200))
         self.screen.blit(self.assets[('easy',(7,))], (WIDTH//2-200, HEIGHT//2-75))
         self.screen.blit(self.assets[('medium',(9,11))], (WIDTH//2-200, HEIGHT//2))
         self.screen.blit(self.assets[('hard',(13,))],(WIDTH//2-200, HEIGHT//2+100))
-        y_offset_list = deque([-75,0,100])
+        y_offset_list = deque([-40,45,140])
+        
         for out in output.values():
             offset = y_offset_list.popleft()
-            self._draw_score(str(out),offset)
+            self._draw_score(str(out),100,offset)
         menu_button = self.assets['menu'].get_rect(center=(WIDTH//2, HEIGHT//2+250))
         self.screen.blit(self.assets['menu'], menu_button)
         return menu_button
