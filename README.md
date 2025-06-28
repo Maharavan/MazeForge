@@ -106,7 +106,6 @@ MazeForge/
 
 ### ✅ HighScoreDB
 
-- Stores scores with player name, maze size, and time
 - Shows **top scores per difficulty level**
 - SQLite-backed and persistently stored in `HighScore.db`
 
